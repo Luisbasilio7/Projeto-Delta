@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
 
 class Consulta:
     def __init__(self, pesquisa):
@@ -50,35 +51,39 @@ class Produto:
     def __repr__(self):
         return f"Produto(title={self.title}, img={self.img}, price={self.price}, story={self.story})"
 
+def processar_produto(produto):
+    try:
+        # Encontrar o título do produto
+        produto_title_elem = produto.find('img', attrs={'width': '80'})
+        produto_title = produto_title_elem['title'] if produto_title_elem else 'N/A'
+
+        # Encontrar a imagem do produto
+        produto_img_elem = produto.find('img', attrs={'width': '80'})
+        produto_img = produto_img_elem['src'] if produto_img_elem else 'N/A'
+
+        # Encontrar o preço do produto
+        produto_price_elem = produto.find('span', attrs={'class': 'Text_Text__ARJdp Text_MobileHeadingS__HEz7L OfferPrice_InCash___m2LM'})
+        produto_price = produto_price_elem.contents[0] if produto_price_elem else 'N/A'
+
+        # Encontrar a loja do produto
+        produto_story_elem = produto.find('a', attrs={'class': 'OfferMerchant_Merchant__ofL4t'})
+        produto_story = produto_story_elem['title'][8:] if produto_story_elem else 'N/A'
+
+        # Criar objeto Produto
+        if produto_title != 'N/A':
+            return Produto(produto_title, produto_img, produto_price, produto_story)
+    except AttributeError:
+        return None
+
 def extrair_produtos(produtos_ordenados):
     response = []
 
-    for produto in produtos_ordenados:
-        try:
-            # Encontrar o título do produto
-            produto_title_elem = produto.find('img', attrs={'width': '80'})
-            produto_title = produto_title_elem['title'] if produto_title_elem else 'N/A'
-
-            # Encontrar a imagem do produto
-            produto_img_elem = produto.find('img', attrs={'width': '80'})
-            produto_img = produto_img_elem['src'] if produto_img_elem else 'N/A'
-
-            # Encontrar o preço do produto
-            produto_price_elem = produto.find('span', attrs={'class': 'Text_Text__ARJdp Text_MobileHeadingS__HEz7L OfferPrice_InCash___m2LM'})
-            produto_price = produto_price_elem.contents[0] if produto_price_elem else 'N/A'
-
-            # Encontrar a loja do produto
-            produto_story_elem = produto.find('a', attrs={'class': 'OfferMerchant_Merchant__ofL4t'})
-            produto_story = produto_story_elem['title'][8:] if produto_story_elem else 'N/A'
-
-            # Criar objeto Produto e adicionar à lista
-            p = Produto(produto_title, produto_img, produto_price, produto_story)
-            response.append(p)
-
-        except AttributeError as e:
-            # Lidar com a situação em que algum dos elementos não foi encontrado
-            print("Erro ao processar produto:", e)
-            continue  # Continuar para o próximo produto
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_produto = {executor.submit(processar_produto, produto): produto for produto in produtos_ordenados}
+        for future in future_to_produto:
+            result = future.result()
+            if result:
+                response.append(result)
 
     return response
 

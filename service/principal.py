@@ -211,6 +211,7 @@ class Ui_MainWindow(object):
         font.setBold(True)
         font.setWeight(75)
         item.setFont(font)
+        item.setStyleSheet("border: 1px solid black;")
         self.tabela_resultado.setHorizontalHeaderItem(4, item)
         self.tabela_resultado.horizontalHeader().setCascadingSectionResizes(False)
         self.tabela_resultado.horizontalHeader().setSortIndicatorShown(False)
@@ -222,8 +223,6 @@ class Ui_MainWindow(object):
         self.tabela_resultado.setColumnWidth(3, 130)
         self.tabela_resultado.setColumnWidth(4, 0)
         
-        header = self.tabela_resultado.horizontalHeaderItem(0)
-        header.setTextAlignment(QtCore.Qt.AlignCenter)
         
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -247,12 +246,16 @@ class Ui_MainWindow(object):
         # item.setText(_translate("MainWindow", "Itens"))
         item = self.tabela_resultado.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Modelo "))
+        
         item = self.tabela_resultado.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Preço"))
+        
         item = self.tabela_resultado.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "Loja"))
+        
         item = self.tabela_resultado.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Imagem"))
+        
 import icons
 
 
