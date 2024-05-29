@@ -211,7 +211,6 @@ class Ui_MainWindow(object):
         font.setBold(True)
         font.setWeight(75)
         item.setFont(font)
-        item.setStyleSheet("border: 1px solid black;")
         self.tabela_resultado.setHorizontalHeaderItem(4, item)
         self.tabela_resultado.horizontalHeader().setCascadingSectionResizes(False)
         self.tabela_resultado.horizontalHeader().setSortIndicatorShown(False)
